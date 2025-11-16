@@ -1,0 +1,65 @@
+# Dataset Configuration
+dataset:
+  name: "dair_v2x"
+  root_path: "/workspace/data/dair_v2x"
+  infra_path: "infrastructure-side"
+  vehicle_path: "vehicle-side"
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  classes: ["Car", "Pedestrian", "Cyclist"]
+  point_cloud_range: [0, -39.68, -3, 69.12, 39.68, 1]
+  voxel_size: [0.16, 0.16, 4]
+  max_points_per_voxel: 32
+  max_voxels: 16000
+
+# Model Configuration
+model:
+  name: "CooperativePointPillars"
+  backbone:
+    type: "PointPillars"
+    pillar_features: 64
+    pillar_size: [0.16, 0.16]
+    point_cloud_range: [0, -39.68, -3, 69.12, 39.68, 1]
+    voxel_size: [0.16, 0.16, 4]
+  fusion:
+    type: "IntermediateFusion"
+    method: "cross_attention"
+    feature_dim: 384
+    num_heads: 8
+    hidden_dim: 512
+  head:
+    type: "MultiGroupHead"
+    class_names: ["Car", "Pedestrian", "Cyclist"]
+    num_anchor_per_loc: 2
+    box_coder: "PointResidualCoder"
+
+# Training Configuration
+training:
+  batch_size: 4
+  num_epochs: 100
+  learning_rate: 0.001
+  weight_decay: 0.01
+  warmup_epochs: 5
+  optimizer: "AdamW"
+  scheduler: "CosineAnnealing"
+  gradient_clip: 10.0
+  checkpoint_interval: 5
+
+# Loss Configuration
+loss:
+  classification:
+    type: "FocalLoss"
+    alpha: 0.25
+    gamma: 2.0
+  localization:
+    type: "SmoothL1Loss"
+    beta: 1.0
+  direction:
+    type: "CrossEntropyLoss"
+
+# Evaluation Configuration
+evaluation:
+  metrics: ["mAP", "AP_0.5", "AP_0.7", "Recall", "Precision"]
+  iou_thresholds: [0.5, 0.7]
+  class_names: ["Car", "Pedestrian", "Cyclist"]

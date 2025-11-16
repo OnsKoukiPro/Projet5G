@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  cooperative-perception:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: coop-perception
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ../src:/workspace/src
+      - ../configs:/workspace/configs
+      - ../scripts:/workspace/scripts
+      - ../data:/workspace/data
+      - ../outputs:/workspace/outputs
+      - ../checkpoints:/workspace/checkpoints
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    shm_size: 8g
